@@ -1,0 +1,20 @@
+import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.List;
+class SimulationMethods {
+    public static LinkedList<Cell> createCellChain(int length, double timestep,double jamDensity, double maxFlow, double currentFlow,double ffspeed) {
+        double density = currentFlow/ffspeed;
+        int numCells = (int) (length*ffspeed/timestep); 
+        Cell []cells = new Cell[numCells];
+        for (int i = 0; i < numCells ; i++) {
+            cells[i] = new Cell(maxFlow/3600.0*timestep,density/numCells,jamDensity*length/numCells,0.0);
+        }
+        List<Cell> list = Arrays.asList(cells);
+        LinkedList<Cell> network = new LinkedList<Cell>(list);
+        return network;
+    }
+
+    public static void changeCapacity(LinkedList<Cell> cellchain, double x) {
+        
+    }
+}
