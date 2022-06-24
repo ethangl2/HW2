@@ -3,6 +3,7 @@ public class Cell {
     private double numCars;
     private double maxCars;
     private double currentFlow;
+
     public Cell(double maxFlow, double numCars,double maxCars,double currentFlow) {
         this.maxFlow = maxFlow;
         this.numCars = numCars;
