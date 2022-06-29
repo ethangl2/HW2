@@ -10,6 +10,8 @@ public class Road {
     private double ffspeed;
 
     private int id;
+
+    private ArrayList<Double[]> connecting_points;
     private Graph<Cell, DefaultEdge> roadGraph;
 
     public Road(int length, double jamDensity, double maxFlow, double currentFlow, double ffspeed, int id) {
@@ -20,6 +22,8 @@ public class Road {
         this.ffspeed = ffspeed;
         Graph<Cell, DefaultEdge> roadGraph1 = new DefaultDirectedGraph<>(DefaultEdge.class);
         this.roadGraph = roadGraph1;
+        ArrayList<Double[]> connecting_points1 = new ArrayList<Double[]>();
+        this.connecting_points = connecting_points1;
         this.id = id;
     }
     public Road() {
@@ -34,6 +38,11 @@ public class Road {
     public Graph<Cell, DefaultEdge> getRoadGraph() {return this.roadGraph;}
     public int getId() {return this.id;}
 
+    public ArrayList<Double[]> getConnecting_points() {return this.connecting_points;}
+    public void addConnectingPoint(double x,double id) {
+        Double[] pair = {x,id};
+        this.connecting_points.add(pair);
+    }
     @Override
     public String toString() {
         String toreturn = "";

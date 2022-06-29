@@ -1,7 +1,10 @@
 import java.util.*;
 import org.jgrapht.*;
+import org.jgrapht.generate.NamedGraphGenerator;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+
+import static org.jgrapht.Graphs.addGraph;
 
 class SimulationMethods {
     static int timestep;
@@ -43,12 +46,47 @@ class SimulationMethods {
             System.out.println(network + " " + t*timestep);
         }
     }
-    public static void createMergingRoad(Graph<Road, DefaultEdge> network,int length,double jamDensity, double maxFlow, double currentFlow,double ffspeed, int name, int parentRode, double x) {
-        network.addVertex(new Road(length,jamDensity,maxFlow,currentFlow,ffspeed,name));
+    public static Graph<Cell,DefaultEdge> generateCellGraph(Graph<Road, DefaultEdge> network) {
+        Graph<Cell,DefaultEdge> toreturn = new DefaultDirectedGraph<>(DefaultEdge.class);
+        Set<DefaultEdge> network_edge_set = network.edgeSet();
+        for(Road road:network.vertexSet()) {
+            addGraph(toreturn,road.getRoadGraph());
+            if(road.getConnecting_points().size() !=0) {
+                ArrayList<Double[]> connecting_point = road.getConnecting_points();
+                Double[] point = connecting_point.get(0);
+                double location = point[0];
+                double id = point[1];
+                Road parentRoad = getRoadByID(network,(int)id);
+                Set<Cell> cellSet = parentRoad.getRoadGraph().vertexSet();
+                int length = parentRoad.getLength();
+                Object[] cellArray = cellSet.toArray();
+                int startIndex = (int) ((cellArray.length-2)*location/length);
+                Cell cell = (Cell) cellArray[startIndex];
+                Set<Cell> childCellSet = road.getRoadGraph().vertexSet();
+                Object[] childCellArray =childCellSet.toArray();
+                Cell lastCell = (Cell) childCellArray[childCellArray.length-1];
+                toreturn.addEdge(lastCell,cell);
+            }
+        }
+
+        return toreturn;
+    }
+    public static Road getRoadByID(Graph<Road, DefaultEdge> network, int id) {
+        for (Road road:network.vertexSet()) {
+            if (road.getId() == id) {
+                return road;
+            }
+        }
+        return null;
+    }
+    public static void createMergingRoad(Graph<Road, DefaultEdge> network,int length,double jamDensity, double maxFlow, double currentFlow,double ffspeed, int id, int parentRode, double x) {
+        network.addVertex(new Road(length,jamDensity,maxFlow,currentFlow,ffspeed,id));
         Set<Road> roadSet = network.vertexSet();
         Object[] roadArray = roadSet.toArray();
         Road newRoad = (Road) roadArray[roadArray.length-1];
-        network.addEdge(newRoad,(Road) roadArray[parentRode]);
+        Road parentRoad1 = (Road) roadArray[parentRode];
+        newRoad.addConnectingPoint(x,parentRoad1.getId());
+        network.addEdge(newRoad,parentRoad1);
         double density = currentFlow/ffspeed;
         int numCells = (int) (length*ffspeed/timestep);
         Cell []cells = new Cell[numCells];
