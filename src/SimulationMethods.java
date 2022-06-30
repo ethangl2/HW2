@@ -4,7 +4,9 @@ import org.jgrapht.generate.NamedGraphGenerator;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import static org.jgrapht.Graphs.addGraph;
+import javax.swing.table.DefaultTableCellRenderer;
+
+import static org.jgrapht.Graphs.*;
 
 class SimulationMethods {
     static int timestep;
@@ -46,12 +48,47 @@ class SimulationMethods {
             System.out.println(network + " " + t*timestep);
         }
     }
+    public static void simulate2(Graph<Road, DefaultEdge> network, int time) {
+        initializeFlow(network);
+        Graph<Cell,DefaultEdge> cell_network = generateCellGraph(network);
+        int num_steps = time/timestep;
+        for (int t = 1; t <=1;t++) {
+            for (Cell currentCell:cell_network.vertexSet()) {
+                if (vertexHasSuccessors(cell_network,currentCell)&&vertexHasPredecessors(cell_network,currentCell)) {
+                    List<Cell> successor_list = successorListOf(cell_network,currentCell);
+                    System.out.println("Successor List " + successor_list);
+                    List<Cell> predecessor_list = predecessorListOf(cell_network,currentCell);
+                    System.out.println("predeccessor List " + predecessor_list);
+                    double numEPrime = 0;
+                    if (successor_list.size() > 1) {
+
+                    } else if(predecessor_list.size()>1) {
+
+                    } else {
+                        Cell next_cell = successor_list.get(0);
+                        Cell prev_cell = predecessor_list.get(0);
+                        double S = Math.min(currentCell.getMaxFlow(),currentCell.getNumCars());
+                        double R = Math.min(next_cell.getMaxFlow(),next_cell.getMaxCars()-next_cell.getNumCars());
+                        double yt = Math.min(S,R);
+                        if (!vertexHasPredecessors(cell_network,prev_cell)) {
+                            currentCell.setNumCars(currentCell.getNumCars()-yt+prev_cell.getCurrentFlow());
+                            numEPrime = prev_cell.getNumCars() + yt;
+                        } else {
+                            currentCell.setNumCars(numEPrime-yt);
+                            numEPrime = next_cell.getNumCars() + yt;
+                        }
+                    }
+                }
+            }
+            //System.out.println(network + " " + t*timestep);
+        }
+
+    }
     public static Graph<Cell,DefaultEdge> generateCellGraph(Graph<Road, DefaultEdge> network) {
         Graph<Cell,DefaultEdge> toreturn = new DefaultDirectedGraph<>(DefaultEdge.class);
-        Set<DefaultEdge> network_edge_set = network.edgeSet();
         for(Road road:network.vertexSet()) {
             addGraph(toreturn,road.getRoadGraph());
-            if(road.getConnecting_points().size() !=0) {
+            if(road.getConnecting_points() !=null && road.getConnecting_points().size() >0) {
                 ArrayList<Double[]> connecting_point = road.getConnecting_points();
                 Double[] point = connecting_point.get(0);
                 double location = point[0];
@@ -68,7 +105,6 @@ class SimulationMethods {
                 toreturn.addEdge(lastCell,cell);
             }
         }
-
         return toreturn;
     }
     public static Road getRoadByID(Graph<Road, DefaultEdge> network, int id) {

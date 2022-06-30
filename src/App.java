@@ -9,8 +9,8 @@ public class App {
         Graph<Road, DefaultEdge> network = SimulationMethods.createNetwork(time_step);
         SimulationMethods.createFirstRoad(network,3,180.0,3000.0,2400.0,60.0);
         SimulationMethods.changeCapacity(network, 1.5, 600,1);
-        SimulationMethods.simulate(network,120);
+        SimulationMethods.simulate2(network,120);
         SimulationMethods.changeCapacity(network, 1.5,3000, 1);
-        SimulationMethods.simulate(network,240);
+        SimulationMethods.simulate2(network,240);
     }
 }
